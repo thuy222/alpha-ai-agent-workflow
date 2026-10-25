@@ -54,7 +54,8 @@ For a change too small to plan:
    when possible (a failing test with `automated_tests`, or the browser on
    local).
 4. Run the profile's checks for that side, then `/review` on the diff.
-5. Commit on the branch; push/PR only when the user asks.
+5. Commit on the branch, with no Claude attribution (see `/implement` §5);
+   push/PR only when the user asks.
 
 If the change grows (several stories, new endpoints, schema changes), stop
 and switch to `/plan`.

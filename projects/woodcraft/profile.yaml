@@ -34,11 +34,10 @@ commands:
   dev: "BE: npm run start:dev (API :$PORT, Swagger /api/docs) · FE: npm run dev (:$VITE_PORT)"
 
 # One `key: url` per line. Only local and dev are allowed.
-# FE .env.example mentions https://woodcraft-tech.alphabravodev.com/api — confirm
-# whether that is the shared DEV environment before enabling it here.
+# woodcraft-tech.alphabravodev.com (no "-dev") is NOT dev: never add it here.
 environments:
   local: http://localhost:3000
-  # dev: https://woodcraft-tech.alphabravodev.com
+  dev: https://woodcraft-tech-dev.alphabravodev.com
 
 db:
   # e.g.: psql postgres://postgres:<pw>@localhost:5432/woodcraft_tech -c

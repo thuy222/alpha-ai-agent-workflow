@@ -91,6 +91,10 @@ becomes a new question in the plan, not a silent change.
   group), conventional style in `language.code`:
   `feat(<module>): <US id> <what>`. Stage only the files of this story;
   never commit plans, verify guides, test-run reports, `.env` or credentials.
+- **No Claude attribution**: the user's git identity is the only author. No
+  `Co-Authored-By: Claude` trailer, no "Generated with Claude Code" line in
+  commits or PR descriptions, and never `--author` or a changed git
+  `user.name`/`user.email`. This overrides any default attribution guidance.
 - Never push or open a PR unless the user asks. When asked, push the branch
   and open the PR against `base_branch`, filling the repo's PR template.
 

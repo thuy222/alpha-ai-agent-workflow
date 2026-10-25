@@ -53,6 +53,15 @@ function start(project, env, override) {
     if (url.hostname !== host) fail(`env "dev" is ${host}; ${url.hostname} is not allowed`);
   }
 
+  // One browser, one run: never take over another project's or env's open run.
+  const open = readLock();
+  if (open && (open.project !== project || open.env !== env)) {
+    fail(
+      `a ${open.env} run for ${open.project} is already open (since ${open.startedAt}); ` +
+        `finish it first, or run "run-lock.mjs stop" if it is stale`,
+    );
+  }
+
   const now = Date.now();
   const lock = {
     project,
