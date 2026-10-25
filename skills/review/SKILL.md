@@ -2,6 +2,8 @@
 name: review
 description: "Independent, read-only code review of a story, module, branch or diff in an alpha project, for the BE or FE side, by the alpha-code-reviewer agent: checks against the BA doc, the plan's decisions and API contract, Lovable, conventions, shared components and TODOs, and returns numbered findings (R1, R2…). Use before committing or opening a PR, 'review US02', 'review nhánh này'."
 argument-hint: "<project> <module|US id|range> [be|fe] [fix]"
+model: sonnet
+effort: low
 ---
 
 # Review

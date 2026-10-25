@@ -40,8 +40,8 @@ environments:
   dev: https://woodcraft-tech-dev.alphabravodev.com
 
 db:
-  # e.g.: psql postgres://postgres:<pw>@localhost:5432/woodcraft_tech -c
-  local_query: ""
+  # Postgres runs in Docker on this machine; PGOPTIONS (read-only) is passed through.
+  local_query: docker exec -i -e PGOPTIONS woodcraft-tech-postgres psql -U postgres -d woodcraft_tech -At -F "|" -c
 
 language: { chat: vi, docs: vi, code: en }
 

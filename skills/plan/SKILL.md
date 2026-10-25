@@ -2,6 +2,8 @@
 name: plan
 description: "Plan a module or user story of any alpha project BEFORE writing code. Loads the project profile, reads the BA doc in docs/user-stories, the Lovable prototype, the DB design and the codebase(s), then writes a BE and/or FE plan broken into the BA's user stories (shared components first), with the API contract, explicit open questions and assumptions for the user to confirm. Use when the user hands over BA user stories, asks to plan, 'lên kế hoạch', break down a module, or before any new screen, feature or API."
 argument-hint: "<project> <module> [be|fe|fullstack] [lovable route] [BA doc path or link]"
+model: opus
+effort: high
 ---
 
 # Plan
@@ -44,7 +46,7 @@ on with everything else meanwhile.
 
 ## 1. Read every source. Do not skim.
 
-Do 1a–1c in parallel. Use `Explore` agents for wide codebase sweeps and keep
+Do 1a–1c in parallel. Use `Explore` agents (`model: "haiku"`) for wide codebase sweeps and keep
 the conclusions, not file dumps. Read Lovable and the docs yourself, because
 the details matter.
 

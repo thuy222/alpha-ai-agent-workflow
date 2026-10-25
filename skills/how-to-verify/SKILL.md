@@ -2,6 +2,8 @@
 name: how-to-verify
 description: "Write a manual verification guide for a module or feature of any alpha project: step-by-step test scenarios a person follows in the UI (which screen, what to click and type, as which role), what each step must show, which API calls and database rows to check, which other screens the action affects, and what to suspect when the result differs. Reads the user stories, plans, Lovable, the FE, the API and the DB design separately, walks the real screens in Chrome first, and saves the guide to docs/plans/<module>.verify.md (git-ignored). The guide is also the input of /automation-test. Use when the user asks how to test or verify a module, 'test thế nào', 'kiểm tra', 'kịch bản test', acceptance or QA scenarios."
 argument-hint: "<project> <module> [US ids] [phase: mock|api] [environment URL]"
+model: sonnet
+effort: medium
 ---
 
 # Verify (write the guide)
@@ -56,8 +58,9 @@ Check these first; if one is missing, stop and tell the user what to do.
 
 ## 1. Read each source separately
 
-Run these research agents in parallel (`general-purpose`, or `Explore` for
-pure code sweeps). Give each only its own source (the concrete paths come
+Run these research agents in parallel (`general-purpose` with
+`model: "sonnet"`, or `Explore` with `model: "haiku"` for pure code sweeps).
+Give each only its own source (the concrete paths come
 from the notes) and the report format below, so each source is read on its
 own terms and gaps between them show up. Each writes
 `<scratch>/how-to-verify-<module>/<source>.md` and replies with a short summary.
@@ -225,7 +228,7 @@ scenario.
 - Every input in the value map is traced in at least one scenario; every
   expected number is recomputed from its formula.
 - **Fresh-reader check:** give the draft (only the guide) to a
-  `general-purpose` agent playing a tester new to the project. It reports every
+  `general-purpose` agent (`model: "sonnet"`) playing a tester new to the project. It reports every
   step where it would not know which screen to open, what to click, where to
   look or what value to expect. Fix each one.
 

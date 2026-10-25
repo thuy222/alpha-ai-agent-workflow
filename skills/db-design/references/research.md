@@ -28,8 +28,9 @@ verifies `notes/` against `raw/` and the SOW, never the other way round.
 
 ## Research agents
 
-Run independent groups in parallel with `general-purpose` agents (they need
-the `lovable` MCP). Write one brief to `<scratch>/db-research/brief.md`
+Run independent groups in parallel with `general-purpose` agents on
+`model: "sonnet"` (they need the `lovable` MCP). Write one brief to
+`<scratch>/db-research/brief.md`
 (project, absolute repo paths, scope, sources and their paths, whether there
 is a SOW, the precedence rule from `SKILL.md`, the report format below) and
 have each agent write `<scratch>/db-research/<group>.md`.

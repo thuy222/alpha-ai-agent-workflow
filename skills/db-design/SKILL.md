@@ -2,6 +2,8 @@
 name: db-design
 description: "Design or extend the Postgres schema / data model of any alpha project from the latest SOW (if any), BA docs, client decisions and the Lovable prototype; have it reviewed by the independent alpha-db-design-reviewer agent; write the committed docs (docs/database/README.md + docs/database/<domain>.md). Always confirms with the user that the sources are the latest before designing. Use when the user asks to design the DB or schema, 'thiết kế db', draw an ERD, add tables for a new module, document the existing schema, or review the schema against new requirements."
 argument-hint: "<project> [all | <module> ...] [path to SOW] [paths/links to new BA docs]"
+model: opus
+effort: high
 ---
 
 # DB design
@@ -283,8 +285,9 @@ Use [db-doc-template.md](db-doc-template.md).
 ## 5. Independent review (mandatory before presenting)
 
 Run the `alpha-db-design-reviewer` agent. It has no shell, and it must run on
-a different model from this session: its definition pins `sonnet`, so when
-this session runs on Sonnet, start it with the Agent tool's `model: "opus"`.
+a different model from this session: this skill runs on Opus and the agent
+pins `sonnet`; if this session was forced onto Sonnet anyway, start it with
+the Agent tool's `model: "opus"`.
 For a small scope, one reviewer in `domain` mode. For `all` or several
 domains, run in parallel one reviewer per domain group (the research groups)
 plus one in `cross-domain` mode for end-to-end flows.

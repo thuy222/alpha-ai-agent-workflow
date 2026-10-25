@@ -2,6 +2,8 @@
 name: automation-test
 description: "Run the scenarios of a verify guide (docs/plans/<module>.verify.md, written by /how-to-verify) in Chrome, ONLY on the local or dev environment: logs in with the accounts from the user's credentials file, follows each step, records Before/after values of the Trace tables, checks network calls and (local only) read-only SQL, and writes a test-run report with PASS/FAIL per check. Use when the user asks to run, execute or automate the test scenarios, 'chạy test', 'test tự động', 'chạy kịch bản', smoke test a module in the browser."
 argument-hint: "<project> <module> [smoke|P0|P1|all|chapter N|VER ids] [env=local|dev] [url=...] [allow-destructive] [record]"
+model: sonnet
+effort: low
 ---
 
 # Test (run a verify guide in the browser)
@@ -116,6 +118,10 @@ mock (run the UI part only), and on `dev` the destructive ones unless
   On `dev`, never run reset or seed commands.
 - **Chrome**: load the Chrome tools in one `ToolSearch` call, run
   `tabs_context_mcp`, and work in a new tab (`tabs_create_mcp`).
+- **Keep it cheap**: screenshots are the bulk of a run's tokens. Read values
+  with `find` / `get_page_text`, not a screenshot; when you need to see the
+  page, use `scale: 0.5` or `zoom` on the region; chain predictable actions
+  in one `browser_batch`; take a full screenshot only as failure evidence.
 
 ## 5. Run each scenario
 

@@ -3,6 +3,7 @@ name: alpha-db-design-reviewer
 description: Independent, read-only adversarial review of a database design written by the alpha db-design skill (docs/database/README.md and docs/database/<domain>.md) in any alpha project. Re-reads the business sources first (BA docs, SOW if any, client decisions, Lovable), then challenges the schema - coverage, cardinalities, which table affects which, status and derived-value rules, integrity, delete policy, scope and conventions. Runs per domain group, or in cross-domain mode for end-to-end flows. Returns findings with stable ids plus a table impact map and never writes files.
 tools: Read, Grep, Glob, mcp__lovable__list_files, mcp__lovable__read_file
 model: sonnet
+effort: high
 ---
 
 You are an independent reviewer of a database design. A different model

@@ -2,6 +2,8 @@
 name: implement
 description: "Write the code for one or more user stories of an agreed alpha plan (docs/plans/<module>.be.md / .fe.md) in the right project repo: checks the plan's open questions, creates a feature branch from the base branch, codes story by story following the repo's CLAUDE.md, ticks the acceptance checklist, runs the project's typecheck/lint/tests, has the alpha-code-reviewer agent review it, and commits on the branch. Use when the user says to start coding, 'code US02', 'làm story', 'implement', after a plan is agreed."
 argument-hint: "<project> <module> [be|fe] [US ids | next]"
+model: sonnet
+effort: medium
 ---
 
 # Implement
