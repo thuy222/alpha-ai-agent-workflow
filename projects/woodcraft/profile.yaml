@@ -1,0 +1,52 @@
+name: woodcraft
+title: Woodcraft ERP
+layout: split
+
+repos:
+  be:
+    path: ../projects/woodcraft-tech-be
+    side: be
+  fe:
+    path: ../projects/woodcraft-tech-fe
+    side: fe
+
+docs:
+  repo: be # docs of BOTH repos live in woodcraft-tech-be/docs
+  plans: docs/plans # git-ignored
+  user_stories: docs/user-stories
+  database: docs/database
+
+lovable_project: 4921eed8-29e1-4d03-9357-63f4a75a0e41
+
+git:
+  base_branch: dev
+  branch_prefix: { feature: feat/, fix: fix/, chore: chore/ }
+
+# Read-only commands only. Note: `npm run lint` in the BE runs eslint --fix,
+# so the BE lint below calls eslint directly.
+commands:
+  be:
+    typecheck: npx tsc --noEmit -p tsconfig.json
+    lint: npx eslint "{src,test}/**/*.ts"
+  fe:
+    typecheck: npx tsc --noEmit
+    lint: npm run lint
+  dev: "BE: npm run start:dev (API :$PORT, Swagger /api/docs) · FE: npm run dev (:$VITE_PORT)"
+
+# One `key: url` per line. Only local and dev are allowed.
+# FE .env.example mentions https://woodcraft-tech.alphabravodev.com/api — confirm
+# whether that is the shared DEV environment before enabling it here.
+environments:
+  local: http://localhost:3000
+  # dev: https://woodcraft-tech.alphabravodev.com
+
+db:
+  # e.g.: psql postgres://postgres:<pw>@localhost:5432/woodcraft_tech -c
+  local_query: ""
+
+language: { chat: vi, docs: vi, code: en }
+
+features:
+  - code_todos
+  - fe_test_scenarios
+  - db_questions_in_be_plan

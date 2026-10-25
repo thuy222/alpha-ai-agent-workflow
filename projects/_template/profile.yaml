@@ -1,0 +1,43 @@
+name: <folder-name>
+title: <Human name>
+layout: split # or monorepo
+
+repos:
+  # split: one entry per repo, each with `side`
+  be:
+    path: ../projects/<repo-be>
+    side: be
+  fe:
+    path: ../projects/<repo-fe>
+    side: fe
+  # monorepo: a single entry with `sides`
+  # main:
+  #   path: ../projects/<repo>
+  #   sides: { be: apps/api, fe: apps/web }
+
+docs:
+  repo: be
+  plans: docs/plans # must be git-ignored in the project
+  user_stories: docs/user-stories
+  database: docs/database
+
+lovable_project: ""
+
+git:
+  base_branch: dev
+  branch_prefix: { feature: feat/, fix: fix/, chore: chore/ }
+
+commands: # read-only only
+  be: { typecheck: "", lint: "" }
+  fe: { typecheck: "", lint: "" }
+  dev: ""
+
+environments: # one `key: url` per line; only local and dev
+  local: http://localhost:3000
+
+db:
+  local_query: ""
+
+language: { chat: vi, docs: vi, code: en }
+
+features: []

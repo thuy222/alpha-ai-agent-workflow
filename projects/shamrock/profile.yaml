@@ -1,0 +1,58 @@
+name: shamrock
+title: Shamrock Equipment
+layout: monorepo
+
+repos:
+  main:
+    path: ../projects/shamrock-equipment
+    sides:
+      be: apps/api
+      fe: apps/web
+    shared: packages/api # @repo/api: HTTP contract types both apps use
+
+docs:
+  repo: main
+  plans: docs/plans # git-ignored
+  user_stories: docs/user-stories
+  database: docs/database
+  db_questions: docs/plans/database.md # git-ignored
+
+lovable_project: 40379c55-db5b-4333-b7c0-0c9d51c5098a
+
+git:
+  base_branch: dev
+  branch_prefix: { feature: feat/, fix: fix/, chore: chore/ }
+
+# Read-only commands only (nothing that runs --fix or writes files).
+commands:
+  be:
+    typecheck: pnpm --filter api run typecheck
+    lint: pnpm --filter api run lint
+    test: pnpm --filter api run test
+    e2e: pnpm --filter api run test:e2e
+  fe:
+    typecheck: pnpm --filter web run typecheck
+    lint: pnpm --filter web run lint
+    test: pnpm --filter web run test
+  dev: pnpm run dev # web :3333, api :5000
+
+# One `key: url` per line. Only local and dev are allowed.
+# Your machine may use other ports: override `url` per env in
+# ~/.config/alpha/credentials/shamrock.yaml.
+environments:
+  local: http://localhost:3333
+  # dev: https://<confirm the shared dev URL before enabling>
+
+db:
+  # Shell prefix that runs one SQL statement on the LOCAL database. Fill in
+  # for your machine, e.g.: psql postgres://postgres:postgres@localhost:5432/shamrock -c
+  local_query: ""
+
+language: { chat: vi, docs: vi, code: en }
+
+features:
+  - ui_spec
+  - ba_delta
+  - automated_tests
+  - mock_phase
+  - migrations

@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+
+# Credentials never live in this repo. They belong in ~/.config/alpha/credentials/.
+# These patterns are a safety net in case one is copied here by mistake.
+credentials/
+*.secrets.*
+*.credentials.*
+.env
+.env.*
+
+# Local Claude Code settings
+.claude/settings.local.json
