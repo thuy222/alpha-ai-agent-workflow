@@ -25,6 +25,7 @@ is). Pick the route; when two fit, take the earlier step in the flow
 | "Review" a story, branch or diff | `/review` |
 | "How to test", "kịch bản test", acceptance scenarios | `/how-to-verify` |
 | "Run the tests / chạy test / smoke test" in the browser | `/automation-test` |
+| A daily report or a day-by-day schedule for Slack | `/generate-daily-report` |
 | A small, precise change (a bug with clear repro, a copy fix, one field) | Direct change: section 3 |
 | Anything else (a question about the code, an estimate) | Answer it directly using the project context |
 

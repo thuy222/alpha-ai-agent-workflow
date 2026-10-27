@@ -22,6 +22,7 @@ dự án rồi làm việc trong đúng repo ở `../projects/`.
 | `/review` | Review read-only bằng agent `alpha-code-reviewer` |
 | `/how-to-verify` | Viết hướng dẫn kiểm thử thủ công `docs/plans/<module>.verify.md` |
 | `/automation-test` | Chạy kịch bản của verify guide trên Chrome, **chỉ local/dev**, rồi ghi báo cáo |
+| `/generate-daily-report` | Report dự kiến từng ngày của một module (FE/BE/ghép API) theo plan và BA doc, copy vào clipboard để dán Slack |
 
 Agents: `alpha-code-reviewer`, `alpha-db-design-reviewer`. Hai agent này có
 prefix vì các repo dự án đã có agent tên `code-reviewer`, và agent của project

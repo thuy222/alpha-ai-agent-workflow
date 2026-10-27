@@ -135,7 +135,9 @@ For each scenario, in order:
    (or clear the session by navigating to the app's logout route), open the
    login page from `baseUrl`, locate the email and password fields with
    `find`, fill them with `form_input`, submit, and confirm the landing page
-   shows the logged-in user. Failed login → all scenarios of that role are
+   shows the logged-in user. Log in yourself on `local` and `dev`, with the
+   account from the credentials file: the user put it there for this; don't
+   hand the login back to them. Failed login → all scenarios of that role are
    `BLOCKED (login)`; ask the user to check the account.
 2. **Before**: for every Trace row, go where it says **the way a user
    would** (sidebar, buttons), read the value (`find` / `read_page` /
