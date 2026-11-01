@@ -32,6 +32,12 @@ commands: # read-only only
   fe: { typecheck: "", lint: "" }
   dev: ""
 
+api: # BE: /implement curls new endpoints on a local server started with this
+  start: ""
+  port_env: PORT
+  prefix: /api/v1
+  login: "POST /auth/login → data.accessToken"
+
 environments: # one `key: url` per line; only local and dev
   local: http://localhost:3000
 

@@ -30,6 +30,7 @@ Passwords never go here: see `skills/automation-test/SKILL.md` for the credentia
 | `git.branch_prefix` | Map of work type → prefix (`feat/`, `fix/`, `chore/`) |
 | `commands.<side>.*` | `typecheck`, `lint`, `test`, `e2e`: **read-only** commands (never one that runs `--fix`) |
 | `commands.dev` | How to start the apps locally (the skills ask before starting servers) |
+| `api` | BE only. `start`: command that runs the API from the current code (no watch); `port_env`: the env var that sets its port; `prefix`: path prefix (`/api/v1`); `login`: the login call and where the token is (`POST /auth/login → data.accessToken`). Used by `/implement`'s live API check; a machine-specific port goes in the credentials file as `local.api_url` |
 | `environments` | `local:` and `dev:` base URLs, **one per line, `key: url`**. `/automation-test` refuses any other key, and its guard script parses this block line by line |
 | `db.local_query` | Optional shell prefix that runs one SQL statement against the **local** DB, e.g. `psql postgres://u:p@localhost:5432/app -c`. Used read-only by `/how-to-verify` and `/automation-test` |
 | `language` | `chat`, `docs`, `code` (`vi` / `en`) |

@@ -1,6 +1,6 @@
 ---
 name: implement
-description: "Write the code for one or more user stories of an agreed alpha plan (docs/plans/<module>.be.md / .fe.md) in the right project repo: checks the plan's open questions, creates a feature branch from the base branch, codes story by story following the repo's CLAUDE.md, ticks the acceptance checklist, runs the project's typecheck/lint/tests, has the alpha-code-reviewer agent review it, and commits on the branch. Use when the user says to start coding, 'code US02', 'làm story', 'implement', after a plan is agreed."
+description: "Write the code for one or more user stories of an agreed alpha plan (docs/plans/<module>.be.md / .fe.md) in the right project repo: checks the plan's open questions, creates a feature branch from the base branch, codes story by story following the repo's CLAUDE.md, ticks the acceptance checklist, runs the project's typecheck/lint/tests, curls every new endpoint and the related APIs on a local server, has the alpha-code-reviewer agent review it, and commits on the branch. Use when the user says to start coding, 'code US02', 'làm story', 'implement', after a plan is agreed."
 argument-hint: "<project> <module> [be|fe] [US ids | next]"
 model: sonnet
 effort: medium
@@ -40,8 +40,11 @@ Decisions and the API contract).
 1. `git -C <repo> status --porcelain`: uncommitted changes that aren't yours →
    stop and ask (never stash, reset or discard someone's work).
 2. `git -C <repo> fetch` then branch from the up-to-date base:
-   `git -C <repo> switch -c <prefix><module>[-<us>] origin/<base_branch>`
+   `git -C <repo> switch --no-track -c <prefix><module>[-<us>] origin/<base_branch>`
    (`branch_prefix.feature` from the profile, e.g. `feat/purchase-orders`).
+   Always `--no-track`: without it the new branch tracks `origin/<base_branch>`
+   and a plain `git push` fails (upstream name differs from the branch). The
+   first push is `git push -u origin HEAD`.
    Already on a branch for this module → keep using it.
 3. Never commit to the base branch, `main` or `master`.
 
@@ -81,10 +84,30 @@ becomes a new question in the plan, not a silent change.
 1. Run the profile's `commands.<side>` (`typecheck`, `lint`, and `test` /
    `e2e` with `automated_tests`) from the repo root. Fix what you broke and
    re-run until clean; report anything pre-existing you didn't touch.
-2. Run the `/review` flow on the story (the `alpha-code-reviewer` agent,
+2. **Live API check (BE, mandatory for every new or changed endpoint).**
+   Automated tests don't replace it: e2e boots the app in-process with fakes,
+   while this calls the real server the FE will call. Follow
+   [api-check.md](api-check.md). In short: start the API from this branch's
+   code (never trust a server that is already running: it may be an older
+   build), log in through the API with each role the story names, using
+   the accounts in `~/.config/alpha/credentials/<project>.yaml`, and curl:
+   - every new or changed endpoint: the happy path with the exact expected
+     status and body fields, each validation and business-rule refusal
+     (status + `errorCode`), and a 403 for a role without the permission;
+   - every **related API** the change must move: the lists, counts,
+     summaries and detail pages of this and other modules that read the same
+     data (e.g. after creating a work order on a unit, the unit's open count;
+     after a transfer, both customers' records and the old work order).
+   Each check prints `PASS`/`FAIL` with expected vs actual. Fix every `FAIL`
+   that is the code's fault and re-run the whole script until it is clean.
+   A `FAIL` caused by the environment (a missing local service, a stale
+   seed) is fixed in the environment, never by changing the expectation;
+   if you can't fix it, report it as not verified. Only `local`, never
+   `dev` or any shared server.
+3. Run the `/review` flow on the story (the `alpha-code-reviewer` agent,
    fresh context). Fix the `blocker` and `major` findings you agree with;
    bring the rest and any disagreement to the user.
-3. Generated files (route trees, icon indexes): include them only when your
+4. Generated files (route trees, icon indexes): include them only when your
    change caused the diff.
 
 ## 5. Commit
@@ -103,6 +126,7 @@ becomes a new question in the plan, not a silent change.
 ## 6. Hand back
 
 In chat: the stories done, the checklist state, the commands' results, the
+live API check (PASS/FAIL count, any check not verified and why), the
 review findings and what happened to each, the commits (hash + message),
 TODOs added/removed, and what's next. Offer `/how-to-verify` (guide) or
 `/automation-test` (run the existing guide) for the module.

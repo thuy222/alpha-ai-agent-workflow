@@ -36,6 +36,13 @@ commands:
     test: pnpm --filter web run test
   dev: pnpm run dev # web :3333, api :5000
 
+# /implement's live API check (skills/implement/api-check.md).
+api:
+  start: cd apps/api && npx nest start
+  port_env: PORT
+  prefix: /api/v1
+  login: "POST /auth/login {email, password} → data.accessToken"
+
 # One `key: url` per line. Only local and dev are allowed.
 # Your machine may use other ports: override `url` per env in
 # ~/.config/alpha/credentials/shamrock.yaml.
