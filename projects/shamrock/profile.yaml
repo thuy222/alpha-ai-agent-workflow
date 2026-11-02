@@ -48,7 +48,7 @@ api:
 # ~/.config/alpha/credentials/shamrock.yaml.
 environments:
   local: http://localhost:3333
-  dev: https://shamrock-equipment-dev.alphabravodev.com
+  dev: https://shamrock.pnts-dev.com
 
 db:
   # Shell prefix that runs one SQL statement on the LOCAL database. Fill in
