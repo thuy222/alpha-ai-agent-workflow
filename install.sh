@@ -2,7 +2,9 @@
 # Installs the workflow for the current user:
 #   - symlinks skills/* into ~/.claude/skills (invoked as /work, /plan, …)
 #   - symlinks agents/*.md into ~/.claude/agents
-#   - sets ALPHA_HOME and the /automation-test navigation guard hook in ~/.claude/settings.json
+#   - sets ALPHA_HOME, the /automation-test navigation guard hook and a Read
+#     permission for ~/.config/alpha/credentials/** (so /automation-test logs
+#     in without a prompt) in ~/.claude/settings.json
 # Safe to re-run. Undo with ./uninstall.sh.
 set -euo pipefail
 
@@ -36,8 +38,10 @@ done
 [ -f "$SETTINGS" ] || echo '{}' > "$SETTINGS"
 cp "$SETTINGS" "$SETTINGS.bak-alpha-$(date +%Y%m%d%H%M%S)"
 tmp="$(mktemp)"
-jq --arg home "$ROOT" --arg guard "$GUARD" '
+jq --arg home "$ROOT" --arg guard "$GUARD" --arg cred "Read(~/.config/alpha/credentials/**)" '
   .env = ((.env // {}) + { ALPHA_HOME: $home })
+  | .permissions = (.permissions // {})
+  | .permissions.allow = (((.permissions.allow // []) - [$cred]) + [$cred])
   | .hooks = (.hooks // {})
   | .hooks.PreToolUse = (
       [ (.hooks.PreToolUse // [])[]
@@ -46,7 +50,7 @@ jq --arg home "$ROOT" --arg guard "$GUARD" '
             hooks: [ { type: "command", command: "node", args: [$guard] } ] } ]
     )
 ' "$SETTINGS" > "$tmp" && mv "$tmp" "$SETTINGS"
-echo "settings ALPHA_HOME=$ROOT, guard hook -> $GUARD (backup next to $SETTINGS)"
+echo "settings ALPHA_HOME=$ROOT, guard hook -> $GUARD, credentials Read rule (backup next to $SETTINGS)"
 
 echo
 echo "Done. Restart Claude Code, then try: /work <project> <request>"

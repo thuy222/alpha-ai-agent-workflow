@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Removes what install.sh added: only symlinks that point into this repo, the
-# ALPHA_HOME env var and the guard hook. Credentials files are left alone.
+# ALPHA_HOME env var, the guard hook and the credentials Read rule. Credentials
+# files are left alone.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -17,8 +18,9 @@ done
 if [ -f "$SETTINGS" ]; then
   cp "$SETTINGS" "$SETTINGS.bak-alpha-$(date +%Y%m%d%H%M%S)"
   tmp="$(mktemp)"
-  jq '
+  jq --arg cred "Read(~/.config/alpha/credentials/**)" '
     (if .env then .env |= del(.ALPHA_HOME) else . end)
+    | (if .permissions.allow then .permissions.allow -= [$cred] else . end)
     | (if .hooks.PreToolUse then
          .hooks.PreToolUse |= [ .[] | select([.hooks[]?.args[]?] | any(endswith("guard-env.mjs")) | not) ]
        else . end)

@@ -67,7 +67,13 @@ get one OK before running.
 
 ## 2. Credentials
 
-Read `~/.config/alpha/credentials/<project>.yaml`.
+Read `~/.config/alpha/credentials/<project>.yaml` with the **Read tool**,
+never through Bash (`cat`, `awk`, `grep`…): `install.sh` adds the permission
+`Read(~/.config/alpha/credentials/**)`, while a shell command that prints a
+password is blocked by auto mode. The user has authorised this file for
+automated logins on `local` and `dev`: log in yourself, don't ask again. If
+the Read tool is refused too, ask the user to re-run `./install.sh` rather
+than handing the login back.
 
 - Missing: stop. Tell the user to copy
   `$ALPHA_HOME/skills/automation-test/credentials.example.yaml` there, fill it, and
@@ -137,8 +143,12 @@ For each scenario, in order:
    `find`, fill them with `form_input`, submit, and confirm the landing page
    shows the logged-in user. Log in yourself on `local` and `dev`, with the
    account from the credentials file: the user put it there for this; don't
-   hand the login back to them. Failed login → all scenarios of that role are
-   `BLOCKED (login)`; ask the user to check the account.
+   hand the login back to them. Clearing `localStorage` alone may leave a
+   half-dead session; clear the cookies too, or open a fresh tab. If the page
+   stays on the login screen, check the field values (typed keys can land in
+   the wrong field) and the form's error text before calling it a failure.
+   Failed login → all scenarios of that role are `BLOCKED (login)`; ask the
+   user to check the account.
 2. **Before**: for every Trace row, go where it says **the way a user
    would** (sidebar, buttons), read the value (`find` / `read_page` /
    `get_page_text`) and log it. Do this before step 1 of the scenario, as the
@@ -147,7 +157,10 @@ For each scenario, in order:
    values typed). On `dev`, append ` #<runId>` to free-text values the guide
    uses to find the record again (scope, name, note) and use the tagged value
    everywhere after, including SQL; never tag values the app validates
-   (emails, codes, numbers).
+   (emails, codes, numbers). Text with accents (Vietnamese, Spanish) can be
+   garbled by the keyboard tool under the OS input method: fill it through
+   the input's native value setter plus an `input` event, and check the saved
+   value before judging the app.
    - **Named values** ("write the number: WO-____, call it WO-A"): read it
      from the screen and log it; later scenarios use it.
    - **Checks**: evaluate every row with a ☐ against what is on screen:
