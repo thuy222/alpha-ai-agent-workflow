@@ -34,10 +34,10 @@ commands:
   dev: "BE: npm run start:dev (API :$PORT, Swagger /api/docs) · FE: npm run dev (:$VITE_PORT)"
 
 # One `key: url` per line. Only local and dev are allowed.
-# woodcraft-tech.alphabravodev.com (no "-dev") is NOT dev: never add it here.
+# Dev moved to woodcraft.pnts-dev.com on 2026-10-29; the old alphabravodev.com hosts are gone.
 environments:
   local: http://localhost:3000
-  dev: https://woodcraft-tech-dev.alphabravodev.com
+  dev: https://woodcraft.pnts-dev.com
 
 db:
   # Postgres runs in Docker on this machine; PGOPTIONS (read-only) is passed through.
