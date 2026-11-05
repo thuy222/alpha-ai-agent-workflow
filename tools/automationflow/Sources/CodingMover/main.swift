@@ -16,7 +16,7 @@ let minDistance: Double = 50     // pixel
 let maxDistance: Double = 250    // pixel
 let userIdleThreshold: Double = 10  // giây; có phím/click/cuộn gần hơn mức này => coi là đang dùng máy
 let positionTolerance: Double = 2   // pixel; chuột lệch quá mức này so với lần trước => người dùng đã di chuột
-let runDuration: Double = 4 * 60 * 60  // giây; tự động dừng sau 4 giờ
+let runDuration: Double = 3 * 60 * 60  // giây; tự động dừng sau 3 giờ
 let scrollChance: Double = 0.3      // xác suất mỗi lượt sẽ cuộn thay vì di chuột (0 = tắt cuộn)
 let minScrollLines: Int = 2         // tổng số dòng cuộn mỗi lượt được random trong khoảng này
 let maxScrollLines: Int = 12        // (cuộn xuống rồi cuộn lên lại đúng chừng đó)
