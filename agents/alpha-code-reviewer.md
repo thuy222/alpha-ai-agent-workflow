@@ -60,6 +60,11 @@ changes, limited to the module named.
    `mcp__lovable__read_file`: the module's route files and what they import.
    Large files are saved to disk: read them in chunks with `sed -n`. A port
    that deliberately fixes a Lovable bug (and says so in the plan) is correct.
+   FE: the design spec `docs/plans/<module>.lovable.md` (by the
+   `alpha-lovable-reader` agent) holds every element's resolved values; use
+   it for the UI check. The property-by-property design diff is that agent's
+   job (`/review` runs it in parallel): don't repeat it, report only what it
+   cannot see (wrong component per the mapping doc, behaviour, states).
 4. Existing local code.
 
 ## What to check

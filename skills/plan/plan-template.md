@@ -22,6 +22,7 @@ profile's `language.docs`, identifiers in English.
 | `docs/user-stories/<module>.md`            | all sections        |                                    |
 | `docs/plans/<module>.be.md` <!-- FE -->    | contract, Decisions |                                    |
 | `docs/database/<domain>.md`                | —                   | designed tables, enums, statuses   |
+| `docs/plans/<module>.lovable.md` <!-- FE --> | Lovable commit `<sha>` | design spec by alpha-lovable-reader |
 | Lovable `src/routes/<module>.tsx`          | lines 1–N / N       | plus imported data/lib/components  |
 | BE code (entities, modules)                | —                   | what already exists                |
 | FE code (screens, API modules, hooks)      | —                   | existing contract / wiring         |
@@ -120,13 +121,16 @@ Breaking changes to existing endpoints / FE types: none | …
 ### UI spec (Lovable) <!-- FE, feature: ui_spec -->
 
 One row per visible element of the story's screens; each row is a `UI-L`
-checkbox above. Local component and variant come from the project's
-Lovable-to-local mapping doc.
+checkbox above. The values live in the design spec
+(`docs/plans/<module>.lovable.md`), cited by element id. Local component and
+variant come from the project's Lovable-to-local mapping doc; the last-but-one
+column says how the local component reaches the spec's values where its
+defaults differ.
 
-| #     | Element                | Lovable (`file:line`, label, control, icon, states, format)                                                | Local component / variant       | Match / Deviation (Decision or Q id) |
-| ----- | ---------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------ |
-| UI-L1 | Filter: Status         | `jobs.index.tsx:948`; outline chip h-8, sliders icon, "Status", count badge, popover: title, ✓ rows, Clear | `FilterDropdown variant="chip"` | Match                                |
-| UI-L2 | Table column "Created" | `:1343`; `MM/DD/YY`, mono 11px, default sort desc                                                          | `formatShortDate()`             | Deviation → Q01.2                    |
+| #     | Element                | Spec id | Local component / variant       | How it matches the spec                          | Match / Deviation (Decision or Q id) |
+| ----- | ---------------------- | ------- | ------------------------------- | ------------------------------------------------ | ------------------------------------ |
+| UI-L1 | Filter: Status         | E1.07   | `FilterDropdown variant="chip"` | variant already h-8, 13px, `SlidersHorizontal` 14 | Match                                |
+| UI-L2 | Table column "Created" | E1.21   | `formatShortDate()`             | `text-mono text-[11px]`                          | Deviation → Q01.2                    |
 
 ### Lovable mapping
 

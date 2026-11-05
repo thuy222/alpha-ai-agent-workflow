@@ -70,7 +70,7 @@ own terms and gaps between them show up. Each writes
 | **stories** | `docs/user-stories/<module>.md` in full, plus the modules it references; the Decisions of `docs/plans/<module>.fe.md` / `.be.md` | Per story: roles, the user flow, every field with its rules (required, format, default), success criteria, business rules and error messages, what each role may and may not do. Decisions override the user story. |
 | **ui**      | The FE routes, screens/feature folder, the components, stores, API modules and hooks they use, the nav definition, the i18n files (if any), the mock seed | How to reach each screen (nav label, route, buttons), exact labels of fields, buttons, tabs, filters and messages, what each action calls (API or mock store), which permission or role hides what, seed records usable as test data. Marks stories with no screen yet and screens still on mock data. **Value map:** for every input a user types or picks, every screen that shows it or a value computed from it (KPI cards, counters, badges, totals, balances, lists in other modules), with the path to reach it and the formula from the code. |
 | **api**     | The BE module (controller, DTOs, services), the entities it writes, the permission constants, tests if any, shared contract types | Every endpoint (method, path, permission), request validation and error responses, response shape, side effects in the services (other tables, activity/audit, stock, integrations, email). Marks what doesn't exist yet. |
-| **lovable** | The Lovable project at HEAD: the module's route/component files and the data/lib files they import; grep the prompt history (`list_messages`) for the module | The intended screens and flows as the client reviewed them: labels, fields, buttons, states, messages, role differences, and every place Lovable differs from the user story or from the FE (Lovable's own bugs are flagged, not copied). |
+| **lovable** | The Lovable project at HEAD: the module's route/component files and the data/lib files they import; grep the prompt history (`list_messages`) for the module. The look (sizes, colours, positions) comes from the design spec, not from this agent | The intended screens and flows as the client reviewed them: labels, fields, buttons, states, messages, role differences, and every place Lovable differs from the user story or from the FE (Lovable's own bugs are flagged, not copied). |
 | **db**      | `docs/database/<domain>.md` and the domains it links to (if written), otherwise the module's entities (and migrations) | Tables and columns each action writes, constraints that reject bad input, derived values with their formulas (stored or computed, what recomputes them), status machines, and **Cross-domain links**: which other tables and modules change or read this data. SQL to inspect each change. |
 
 When a source has nothing (no API yet, no BA doc, no DB doc), the agent says
@@ -99,12 +99,17 @@ is on screen, not what the code suggests:
 5. Compare with the `lovable` report and note the differences. Don't open the
    Lovable preview in Chrome: it needs a Lovable login, and the MCP gives the
    code.
-6. **Visual check** (feature `ui_spec`). For each screen, take a screenshot
-   and go through the plan's **UI spec (Lovable)** rows (if the plan has none,
-   use the `lovable` report): container, control type, icon, labels, order,
-   popover content, active/empty states, formats, case, colours, density.
-   Compare with Lovable screenshots the user shared, too. Record each mismatch
-   with the row id, or as "missing row".
+6. **Visual check** (FE). Use the design spec
+   `docs/plans/<module>.lovable.md` (none → run the `alpha-lovable-reader`
+   agent in `spec` mode first, in parallel with the step 1 agents). For each
+   screen, take a screenshot, run each of its `design-checks` blocks with
+   `$ALPHA_HOME/shared/design-check.js` (`__CHECKS__` replaced by the block's
+   JSON, through the Chrome JavaScript tool, window 1440×900), then go through
+   the spec's element table and the plan's **UI spec (Lovable)** rows for
+   what the script can't measure: control type, icon, popover content,
+   hover/active/empty states, formats, case. Compare with Lovable screenshots
+   the user shared, too. Record each mismatch with its element id (`E1.03`)
+   or `UI-L` id, or as "missing element".
 
 Never trigger browser `alert`/`confirm` dialogs (they block the tools); if a
 button is known to open one, skip it and note it. If a page doesn't load or
@@ -183,9 +188,11 @@ screens has five rows; never shorten it to "check the other screens".
 5. **Effects on other modules**: from the db report's Cross-domain links and
    the api report's side effects. For each: the screen to open, what to look
    for, why it should change.
-6. **Look matches Lovable** (feature `ui_spec`): one P2 scenario per screen
-   that walks its UI spec rows. Visual mismatches from step 2.6 go under
-   **Known gaps** with the `UI-L` id, unless a Decision backs them.
+6. **Look matches Lovable** (FE): one P2 scenario per screen that runs its
+   `design-checks` blocks (name the spec section) and walks the states the
+   script can't measure (and, with feature `ui_spec`, its UI spec rows).
+   Visual mismatches from step 2.6 go under **Known gaps** with the element
+   or `UI-L` id, unless a Decision backs them.
 
 ### Every scenario has
 

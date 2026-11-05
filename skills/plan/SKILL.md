@@ -103,6 +103,21 @@ Project id: `lovable_project` in the profile (the BA doc's "Design Link" also
 points to it). Use the `lovable` MCP; load its tools with `ToolSearch` first.
 If it isn't connected, ask the user to run `/mcp`.
 
+**Design spec (FE scope, always).** Start the `alpha-lovable-reader` agent in
+`spec` mode at the beginning of step 1 (it runs while you read the rest) with
+the project, `$ALPHA_HOME`, the module, the Lovable routes if known, the
+stories and the report language. It writes `docs/plans/<module>.lovable.md`:
+every element with resolved sizes, colours, typography and position, the
+prompt history's design intent, and the design checks `/implement` measures
+in Chrome. That file is the design source of the FE plan; the plan points at
+its element ids (`E1.03`) instead of re-describing them. When it returns,
+read the spec, spot-check a few elements against Lovable yourself, and turn
+each prompt marked **not in code** that touches the scope into a [UI]
+question. A spec already present is refreshed by the same call (it keeps the
+element ids).
+
+Read Lovable yourself for the rest (behaviour, data, rules):
+
 1. `list_files`, paginating until `next_cursor` is null. Find the module's
    route files (`src/routes/<module>*.tsx` or what the notes say).
 2. Read each route file **to the end**. Large results are saved to disk; read
@@ -120,20 +135,12 @@ If it isn't connected, ask the user to run `/mcp`.
      differently in two places, navigation that ignores the view mode);
      **prototype-only mechanics** not to port (localStorage persistence, mock
      data, floating seed dates, `window.confirm`).
-   - **FE plan:** the **UI inventory**: header, KPIs, filters, search, sort,
-     views, table columns, drawer tabs, modals, forms and fields, empty and
-     loading states, exact labels, what navigates where. With feature
-     `ui_spec`, go element by element with `file:line`, not a summary: the
-     plan's UI checklist is built from it, and anything left out will not be
-     built. Cover page header (container, title, subtitle, buttons), KPI cards
-     (label, value colour, computation, roles), filters (control type, icon,
-     label, order, popover content, active state and count, clear actions),
-     search (placeholder, width), sort (control, options, default), view
-     toggles, tables (column order, header style, cell content and format of
-     dates, money and enums, avatars, badges and their case, density, zebra,
-     empty state, pagination), Kanban (column look, card content), every tab
-     and its sections, every dialog (title, fields, buttons, warnings), and
-     what each role sees.
+   - **FE plan:** the **UI inventory** comes from the design spec, element by
+     element: header, KPIs, filters, search, sort, views, tables, Kanban,
+     tabs, dialogs, empty and loading states, exact labels, what navigates
+     where, what each role sees. The plan's UI checklist is built from it,
+     and anything left out will not be built. Check that the spec covers
+     every screen and overlay of the stories; a gap goes back to the agent.
    - **BE plan:** what the screens need from the API: list filters, sort
      columns, search fields, KPIs/stats, lookups.
 6. If screenshots were shared, compare them with the code. Behaviour the user
@@ -222,9 +229,11 @@ comes first. Each `USxx` section has:
   business rule, validation, state transition and permission the API must
   enforce. Coding follows this checklist; review ticks it off.
 - **UI spec (Lovable)** (FE, feature `ui_spec`): one row per element of the
-  story's screens: element, Lovable (`file:line`, exact label, control, icon,
-  states, format), local component and variant (from the mapping doc the notes
-  name), and **Match** or **Deviation (Decision or Q id)**.
+  story's screens: element, its design spec id(s) (`E1.03`; the values live
+  in the spec), local component and variant (from the mapping doc the notes
+  name) and **how the local component reaches the spec's values** (antd
+  `size`/props, theme token, `className`) when its defaults differ, and
+  **Match** or **Deviation (Decision or Q id)**.
 - **Lovable mapping** with `file:line` references.
 - **Gaps** for this story; the last column names the Decision or question
   that settles each row.
@@ -243,9 +252,9 @@ comes first. Each `USxx` section has:
   nothing.
 - **Verification**: automated tests (feature `automated_tests`, with the
   commands from the profile) and the manual checks: FE in the browser
-  (including empty, loading and error states, and with `ui_spec` a
-  side-by-side check of each screen against its UI spec rows: the local app in
-  Chrome, Lovable through its code or the user's screenshots, never its
+  (including empty, loading and error states, and the design spec's
+  `design-checks` for the story's screens, run in Chrome on the local app;
+  Lovable is read through its code or the user's screenshots, never its
   preview); BE through Swagger or HTTP calls, including a 403 without the
   permission and the validation errors.
 - **Depends on**: US00 components, other stories, BE endpoints, modules.

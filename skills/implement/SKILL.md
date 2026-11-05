@@ -1,6 +1,6 @@
 ---
 name: implement
-description: "Write the code for one or more user stories of an agreed alpha plan (docs/plans/<module>.be.md / .fe.md) in the right project repo: checks the plan's open questions, creates a feature branch from the base branch, codes story by story following the repo's CLAUDE.md, ticks the acceptance checklist, runs the project's typecheck/lint/tests, curls every new endpoint and the related APIs on a local server, has the alpha-code-reviewer agent review it, and commits on the branch. Use when the user says to start coding, 'code US02', 'làm story', 'implement', after a plan is agreed."
+description: "Write the code for one or more user stories of an agreed alpha plan (docs/plans/<module>.be.md / .fe.md) in the right project repo: checks the plan's open questions, creates a feature branch from the base branch, codes story by story following the repo's CLAUDE.md, ticks the acceptance checklist, runs the project's typecheck/lint/tests, curls every new endpoint and the related APIs on a local server, checks FE screens against the Lovable design spec (alpha-lovable-reader compare + measured design checks in Chrome), has the alpha-code-reviewer agent review it, and commits on the branch. Use when the user says to start coding, 'code US02', 'làm story', 'implement', after a plan is agreed."
 argument-hint: "<project> <module> [be|fe] [US ids | next]"
 model: sonnet
 effort: medium
@@ -56,6 +56,16 @@ For each story (US00 first when it exists):
    `ui_spec`), gaps and their resolutions, tasks, Code TODOs, Lovable mapping.
    Open the Lovable `file:line` references you are porting (the `lovable`
    MCP); port the behaviour and design, never paste a Lovable file whole.
+   **FE:** read the design spec `docs/plans/<module>.lovable.md` sections for
+   the story's screens (tokens, primitives, element tables, overlays). No
+   spec → run the `alpha-lovable-reader` agent in `spec` mode first. Build
+   each element to the spec's **resolved values**, not to how a component
+   looks by default: antd's defaults (control height, font size, radius,
+   colours, padding) usually differ from Lovable's shadcn ones, so set the
+   size/props, the local theme token or the `className` that gives the
+   spec's px and hex values, and keep the spec's order, position and exact
+   texts. A value the local design tokens can't express becomes a question,
+   never a "close enough".
 2. Follow the repo's `CLAUDE.md` (layout, naming, components, API layer, i18n,
    commands) and match the surrounding code's style and comment density.
    Teammates' code is additive-only: extra enum values and optional props, no
@@ -104,10 +114,31 @@ becomes a new question in the plan, not a silent change.
    seed) is fixed in the environment, never by changing the expectation;
    if you can't fix it, report it as not verified. Only `local`, never
    `dev` or any shared server.
-3. Run the `/review` flow on the story (the `alpha-code-reviewer` agent,
+3. **Design check (FE, mandatory for every screen the story touches).** Code
+   that looks right in the diff is not checked against the design until it
+   is measured.
+   1. Run the `alpha-lovable-reader` agent in `compare` mode on the story's
+      local files. Fix every `major` and `minor` mismatch not backed by a
+      Decision; re-run until it reports none.
+   2. Measure in Chrome on the **local** app only (load the
+      `claude-in-chrome` skill; log in with the accounts in
+      `~/.config/alpha/credentials/<project>.yaml`; never `dev` or a shared
+      server). For each `design-checks` block of the story's screens: open
+      its route in its `setup` state at a 1440×900 window, run
+      `$ALPHA_HOME/shared/design-check.js` with `__CHECKS__` replaced by the
+      block's JSON through the Chrome JavaScript tool, fix each `FAIL` and
+      `NOT_FOUND` in the code, reload and re-run until all `PASS`. A
+      `NOT_FOUND` caused by the check itself (the element has a different
+      but correct text) is fixed in the spec, saying so in the hand-back.
+   3. Take a screenshot of each screen and each overlay for the hand-back,
+      and walk the spec's interactive states (hover, open popovers, empty and
+      loading) by hand.
+   A check you could not run (no local server, no seed data) is reported as
+   not verified, never as passed.
+4. Run the `/review` flow on the story (the `alpha-code-reviewer` agent,
    fresh context). Fix the `blocker` and `major` findings you agree with;
    bring the rest and any disagreement to the user.
-4. Generated files (route trees, icon indexes): include them only when your
+5. Generated files (route trees, icon indexes): include them only when your
    change caused the diff.
 
 ## 5. Commit
@@ -127,6 +158,7 @@ becomes a new question in the plan, not a silent change.
 
 In chat: the stories done, the checklist state, the commands' results, the
 live API check (PASS/FAIL count, any check not verified and why), the
-review findings and what happened to each, the commits (hash + message),
+design check (FE: compare mismatches left, design checks PASS/FAIL per
+screen, screenshots, any not verified and why), the review findings and what happened to each, the commits (hash + message),
 TODOs added/removed, and what's next. Offer `/how-to-verify` (guide) or
 `/automation-test` (run the existing guide) for the module.

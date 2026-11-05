@@ -40,7 +40,7 @@ Passwords never go here: see `skills/automation-test/SKILL.md` for the credentia
 
 | Feature | Effect |
 | --- | --- |
-| `ui_spec` | FE plans carry a **UI spec (Lovable)** table with `UI-L` checklist rows; review and verify check the screen against it |
+| `ui_spec` | FE plans carry a **UI spec (Lovable)** table with `UI-L` checklist rows pointing at the design spec's element ids; review and verify check the screen against it. (The design spec `docs/plans/<module>.lovable.md` and its design checks are written for every FE plan, with or without this feature.) |
 | `ba_delta` | When a BA doc changes after code was built, plans get a **BA delta** section and untick affected items |
 | `code_todos` | Plans list **Code TODOs** per story; implement writes `TODO(<module>)` comments; review checks them |
 | `fe_test_scenarios` | FE plans end with a manual **Test scenarios** table |
