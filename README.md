@@ -1,8 +1,8 @@
 # alpha-fullstack
 
-Một bộ skill Claude Code dùng chung cho mọi dự án Alpha Bravo. Bạn gọi slash
-command, kèm tên dự án và yêu cầu (hoặc tài liệu). Skill tự đọc profile của
-dự án rồi làm việc trong đúng repo ở `../projects/`.
+A set of Claude Code skills shared by every Alpha Bravo project. You call a
+slash command with a project name and a request (or a document). The skill
+reads the project's profile and works in the right repo under `../projects/`.
 
 ```
 /work woodcraft docs/BA/purchase-orders.pdf
@@ -11,105 +11,137 @@ dự án rồi làm việc trong đúng repo ở `../projects/`.
 /automation-test shamrock work-orders smoke env=local
 ```
 
-## Các skill
+## Skills
 
-| Lệnh | Việc |
+| Command | What it does |
 | --- | --- |
-| `/work <project> <yêu cầu>` | Điểm vào chung: phân loại yêu cầu rồi gọi skill phù hợp (hoặc sửa nhỏ trực tiếp) |
-| `/plan` | Lên kế hoạch BE/FE theo user story của BA, Lovable và code hiện có; có câu hỏi mở. Không code |
-| `/db-design` | Thiết kế hoặc ghi tài liệu DB, xác nhận nguồn mới nhất, có reviewer độc lập |
-| `/implement` | Code theo plan đã chốt: tạo branch, code từng story, check, review, commit (không push nếu chưa được bảo) |
-| `/review` | Review read-only bằng agent `alpha-code-reviewer` |
-| `/how-to-verify` | Viết hướng dẫn kiểm thử thủ công `docs/plans/<module>.verify.md` |
-| `/automation-test` | Chạy kịch bản của verify guide trên Chrome, **chỉ local/dev**, rồi ghi báo cáo |
-| `/generate-daily-report` | Report dự kiến từng ngày của một module (FE/BE/ghép API) theo plan và BA doc, copy vào clipboard để dán Slack |
+| `/work <project> <request>` | Common entry point: classifies the request and runs the matching skill (or makes a small change directly) |
+| `/plan` | Plans BE/FE from the BA user stories, Lovable and the existing code, with open questions. Writes no code |
+| `/db-design` | Designs or documents the DB, confirms the sources are the latest, with an independent reviewer |
+| `/implement` | Codes an agreed plan: creates a branch, codes story by story, checks, reviews, commits (no push unless asked) |
+| `/review` | Read-only review by the `alpha-code-reviewer` agent (plus a design diff by `alpha-lovable-reader` for FE) |
+| `/how-to-verify` | Writes a manual verification guide `docs/plans/<module>.verify.md` |
+| `/automation-test` | Runs the verify guide's scenarios in Chrome, **local/dev only**, and writes a report |
+| `/generate-daily-report` | Planned day-by-day report for a module (FE/BE/API integration) from the plans and BA doc, copied to the clipboard for Slack |
 
-Agents: `alpha-code-reviewer`, `alpha-db-design-reviewer`. Hai agent này có
-prefix vì các repo dự án đã có agent tên `code-reviewer`, và agent của project
-sẽ được ưu tiên.
+Agents: `alpha-code-reviewer`, `alpha-db-design-reviewer`,
+`alpha-lovable-reader`. They carry a prefix because a project repo may have an
+agent with the same base name (`code-reviewer`), and the project's agent would
+win.
 
-### Trùng tên với lệnh có sẵn
+### Making the code match the Lovable design
 
-Đây là personal skill nên **thay thế** lệnh cùng tên của Claude Code trong
-terminal local:
+`alpha-lovable-reader` reads Lovable at one fixed commit, every file to the
+end, plus the prompt history. It has two modes:
 
-- `/plan` thay lệnh built-in "vào plan mode". Muốn vào plan mode thì dùng
-  `Shift+Tab`.
-- `/review` của Claude Code là alias của `/code-review`. Tài liệu chưa nói rõ
-  skill cá nhân có đè được alias hay không. Nếu `/review` vẫn mở code-review
-  của Claude Code, đổi tên thư mục `skills/review` (ví dụ thành `cr`) rồi chạy
-  lại `./install.sh`.
-- `/db-design` và `/how-to-verify` trùng tên với skill cùng tên đã commit
-  trong repo shamrock và woodcraft-be.
+- `spec`: writes `docs/plans/<module>.lovable.md` with the tokens (colours as
+  hex, radius, fonts), the shadcn primitives resolved to values, and every
+  element of every screen (`E1.03`): its original classes with `file:line`,
+  px/hex values, position, exact text, icon, states, format, behaviour and
+  roles. It also lists prompts "not in code", Lovable bugs, and
+  `design-checks` blocks (JSON) to measure against.
+- `compare`: checks the local code against the spec property by property and
+  returns a `DD1, DD2…` table.
 
-## Cài đặt (một lần mỗi máy)
+Where it runs:
+
+- `/plan` (FE): always runs `spec`. The plan's UI spec points at element ids.
+- `/implement` (FE): codes to the spec's values, not to antd's defaults.
+  Before review it must run `compare`, then `shared/design-check.js` in
+  Chrome on the local app (`getComputedStyle`) until every check passes.
+- `/review` (FE): runs `compare` in parallel with `alpha-code-reviewer`.
+- `/how-to-verify`: the "Look matches Lovable" scenario runs the
+  `design-checks`.
+
+### Name clashes with built-in commands
+
+These are personal skills, so they **replace** Claude Code commands with the
+same name in the local terminal:
+
+- `/plan` replaces the built-in "enter plan mode". Use `Shift+Tab` to enter
+  plan mode.
+- Claude Code's `/review` is an alias of `/code-review`. The docs don't say
+  whether a personal skill overrides an alias. If `/review` still opens
+  Claude Code's code review, rename the `skills/review` folder (e.g. to `cr`)
+  and re-run `./install.sh`.
+- `/db-design` and `/how-to-verify` share their names with skills committed
+  in the shamrock and woodcraft-be repos.
+
+## Install (once per machine)
 
 ```bash
 ./install.sh
 ```
 
-Script này làm ba việc:
-- symlink `skills/*` vào `~/.claude/skills/` và `agents/*.md` vào
+The script does three things:
+- symlinks `skills/*` into `~/.claude/skills/` and `agents/*.md` into
   `~/.claude/agents/`;
-- thêm `ALPHA_HOME` vào `~/.claude/settings.json`;
-- thêm hook guard của `/automation-test` vào cùng file đó.
+- adds `ALPHA_HOME` to `~/.claude/settings.json`;
+- adds the `/automation-test` guard hook to the same file.
 
-Settings được backup cạnh file gốc trước khi sửa. Script chạy lại nhiều lần
-không sao. Gỡ bằng `./uninstall.sh`. Sau khi cài, restart Claude Code.
+Settings are backed up next to the original before any change. The script is
+safe to re-run. Uninstall with `./uninstall.sh`. Restart Claude Code after
+installing.
 
-Vì là symlink, sửa skill, profile hay notes trong repo này là có hiệu lực ngay
-từ phiên sau. Không cần cài lại, trừ khi bạn thêm một skill hoặc agent mới.
+Because these are symlinks, edits to skills, profiles or notes in this repo
+apply from the next session. No reinstall is needed unless you add a new
+skill or agent.
 
-Tài khoản test cho `/automation-test`: copy `skills/automation-test/credentials.example.yaml` sang
-`~/.config/alpha/credentials/<project>.yaml`, điền thông tin, rồi
-`chmod 600`. File này **không bao giờ** được nằm trong repo.
+Test accounts for `/automation-test`: copy
+`skills/automation-test/credentials.example.yaml` to
+`~/.config/alpha/credentials/<project>.yaml`, fill it in, then `chmod 600`.
+This file must **never** be in the repo.
 
-Tuỳ chọn: điền `db.local_query` trong profile để `/how-to-verify` và `/automation-test` chạy
-được SQL read-only trên DB local.
+Optional: set `db.local_query` in the profile so `/how-to-verify` and
+`/automation-test` can run read-only SQL on the local DB.
 
-## Chạy ở đâu
+## Where to run
 
-- **Trong repo dự án** (ví dụ `cd ../projects/woodcraft-tech-be && claude`):
-  không cần gõ tên dự án, skill tự nhận ra từ thư mục hiện tại.
-- **Trong repo này**: `.claude/settings.json` đã cho phép truy cập
-  `../projects`, nên một phiên có thể làm việc trên nhiều repo (FE + BE).
+- **In a project repo** (e.g. `cd ../projects/woodcraft-tech-be && claude`):
+  no need to type the project name, the skills detect it from the current
+  directory.
+- **In this repo**: `.claude/settings.json` already allows access to
+  `../projects`, so one session can work across several repos (FE + BE).
 
-## Cấu trúc
+## Layout
 
 ```
 install.sh / uninstall.sh
-shared/               load-project.md: bước 0 chung cho mọi skill
-skills/<name>/        SKILL.md + template của từng skill
-agents/               alpha-code-reviewer, alpha-db-design-reviewer
-hooks/                guard-env.mjs: chặn trình duyệt rời local/dev khi đang chạy /automation-test
-projects/<name>/      profile.yaml + notes/<skill>.md (phần riêng của từng dự án)
+shared/               load-project.md: step 0 of every skill;
+                      design-check.js: measures a local screen against the design spec
+skills/<name>/        SKILL.md + templates of each skill
+agents/               alpha-code-reviewer, alpha-db-design-reviewer, alpha-lovable-reader
+hooks/                guard-env.mjs: keeps the browser on local/dev while /automation-test runs
+projects/<name>/      profile.yaml + notes/<skill>.md (what is specific to each project)
+tools/automationflow/ CodingMover: keeps the Mac awake and active (swift run)
 ```
 
-Skill chỉ mô tả **quy trình chung**. Thông tin riêng của dự án (đường dẫn,
-lệnh, convention khác nhau) nằm trong `projects/<name>/`. Convention code vẫn
-nằm trong `CLAUDE.md` của từng repo dự án, vì team dùng chung file đó. Xem
-`projects/README.md` để biết các key của profile và các feature.
+Skills describe only the **generic process**. Project specifics (paths,
+commands, conventions that differ) live in `projects/<name>/`. Code
+conventions stay in each project repo's `CLAUDE.md`, because the team shares
+that file. See `projects/README.md` for the profile keys and features.
 
-## An toàn của `/automation-test`
+## `/automation-test` safety
 
-- `run-lock.mjs` chỉ mở phiên test với `local` (localhost) hoặc `dev` (host
-  khai báo trong profile). Mọi môi trường khác đều bị từ chối.
-- Trong lúc phiên test đang mở, hook `PreToolUse` chặn mọi lệnh navigate của
-  Chrome ra ngoài môi trường đó. Hook này không phụ thuộc vào việc model có
-  làm đúng hay không. Phiên tự hết hạn sau 8 giờ. Nếu cần gỡ khoá thủ công:
+- `run-lock.mjs` opens a test session only for `local` (localhost) or `dev`
+  (the host declared in the profile). Every other environment is refused.
+- While a test session is open, a `PreToolUse` hook blocks every Chrome
+  navigation outside that environment. The hook doesn't depend on the model
+  behaving. Sessions expire after 8 hours. To remove the lock by hand:
   `rm ~/.config/alpha/test-run.json`.
-- SQL chỉ chạy `SELECT` trong transaction read-only, và chỉ trên local. Lệnh
-  reset/seed chỉ chạy trên local và phải hỏi trước.
-- Lưu ý: khi đăng nhập qua Chrome, mật khẩu vẫn đi qua ngữ cảnh của model. Vì
-  vậy chỉ dùng tài khoản test.
+- SQL runs only `SELECT` in a read-only transaction, and only on local.
+  Reset/seed commands run only on local and only after asking.
+- Note: when logging in through Chrome, the password still passes through the
+  model's context. Use test accounts only.
 
-## Thêm dự án mới
+## Adding a project
 
-Copy `projects/_template/` thành `projects/<name>/`, điền `profile.yaml`, và
-chỉ viết notes cho những gì khác với skill chung.
+Copy `projects/_template/` to `projects/<name>/`, fill in `profile.yaml`, and
+write notes only for what differs from the generic skills.
 
-## Quan hệ với skill trong repo dự án
+## Relation to the skills in project repos
 
-Các repo dự án vẫn giữ skill gốc (`planning`, `db-design`, `how-to-verify`,
-agent `code-reviewer`…), vì chúng được commit và team đang dùng. Bộ skill này
-không sửa gì trong đó. Khi sửa một quy tắc ở một bên, cân nhắc sửa cả bên kia.
+Project repos keep their original skills (`planning`, `db-design`,
+`how-to-verify`, the `code-reviewer` agent…), because they are committed and
+the team uses them. This set never edits them. When you change a rule on one
+side, consider changing the other.

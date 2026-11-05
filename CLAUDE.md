@@ -18,8 +18,10 @@ project profiles, not application code.
   `alpha-` prefix so project agents with the same base name don't shadow
   them. Adding a skill or agent needs a re-run of `./install.sh`; edits to
   existing files apply from the next session.
-- Skills, agents and templates are written in English; chat with the user in
-  Vietnamese.
+- Everything in this repo is written in English: skills, agents, templates,
+  READMEs, notes, profiles, code and comments. Only the chat with the user is
+  in Vietnamese. (Vietnamese trigger phrases quoted in skill descriptions,
+  such as 'lên kế hoạch', stay: they match what the user types.)
 - Never put credentials in this repo. Test accounts live in
   `~/.config/alpha/credentials/<project>.yaml`.
 - The project repos under `../projects/` keep their own committed skills; this

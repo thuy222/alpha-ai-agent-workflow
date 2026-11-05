@@ -1,40 +1,40 @@
-// Giữ máy không ngủ và giữ trạng thái Active (Slack/Teams) bằng cách
-// di chuyển chuột / cuộn ngẫu nhiên. Bỏ qua khi người dùng đang tự dùng máy.
+// Keeps the Mac awake and the Active status (Slack/Teams) on by moving the
+// mouse / scrolling at random. Does nothing while the user is using the Mac.
 //
-// Chạy: swift run (ở thư mục gốc alpha-fullstack)        Dừng: Ctrl+C
-// Dọn file build: swift package reset
+// Run: swift run (from the alpha-fullstack root)        Stop: Ctrl+C
+// Clean build files: swift package reset
 
 import CoreGraphics
 import Foundation
 import IOKit.pwr_mgt
 
-// MARK: - Cấu hình
+// MARK: - Settings
 
-let minInterval: Double = 1      // giây
-let maxInterval: Double = 20     // giây, luôn < 60
+let minInterval: Double = 1      // seconds
+let maxInterval: Double = 20     // seconds, always < 60
 let minDistance: Double = 50     // pixel
 let maxDistance: Double = 250    // pixel
-let userIdleThreshold: Double = 10  // giây; có phím/click/cuộn gần hơn mức này => coi là đang dùng máy
-let positionTolerance: Double = 2   // pixel; chuột lệch quá mức này so với lần trước => người dùng đã di chuột
-let runDuration: Double = 3 * 60 * 60  // giây; tự động dừng sau 3 giờ
-let scrollChance: Double = 0.3      // xác suất mỗi lượt sẽ cuộn thay vì di chuột (0 = tắt cuộn)
-let minScrollLines: Int = 2         // tổng số dòng cuộn mỗi lượt được random trong khoảng này
-let maxScrollLines: Int = 12        // (cuộn xuống rồi cuộn lên lại đúng chừng đó)
-let maxLinesPerTick: Int = 3        // mỗi nấc cuộn random 1...maxLinesPerTick dòng
+let userIdleThreshold: Double = 10  // seconds; a key/click/scroll more recent than this => the user is active
+let positionTolerance: Double = 2   // pixels; the mouse moved more than this since last time => the user moved it
+let runDuration: Double = 3 * 60 * 60  // seconds; stops on its own after 3 hours
+let scrollChance: Double = 0.3      // chance that a turn scrolls instead of moving the mouse (0 = no scrolling)
+let minScrollLines: Int = 2         // total lines scrolled per turn, random within this range
+let maxScrollLines: Int = 12        // (scrolls down, then back up by the same amount)
+let maxLinesPerTick: Int = 3        // each scroll tick moves a random 1...maxLinesPerTick lines
 
-// MARK: - Quyền Accessibility
+// MARK: - Accessibility permission
 
 if !CGPreflightPostEventAccess() {
     CGRequestPostEventAccess()
     print("""
-    ⚠️  Chưa có quyền điều khiển chuột.
-        Vào System Settings → Privacy & Security → Accessibility,
-        bật cho app Terminal bạn đang dùng, rồi chạy lại `swift run`.
+    ⚠️  No permission to control the mouse.
+        Go to System Settings → Privacy & Security → Accessibility,
+        enable it for the terminal app you are using, then run `swift run` again.
     """)
     exit(1)
 }
 
-// MARK: - Giữ máy không ngủ
+// MARK: - Keep awake
 
 var assertionID: IOPMAssertionID = 0
 let assertionOK = IOPMAssertionCreateWithName(
@@ -56,7 +56,7 @@ sigint.resume()
 
 DispatchQueue.main.asyncAfter(wallDeadline: .now() + runDuration) { cleanupAndExit() }
 
-// MARK: - Chuột
+// MARK: - Mouse
 
 func currentPosition() -> CGPoint {
     CGEvent(source: nil)?.location ?? .zero
@@ -74,7 +74,7 @@ func post(_ p: CGPoint) {
             mouseCursorPosition: p, mouseButton: .left)?.post(tap: .cghidEventTap)
 }
 
-/// Di chuyển mượt (ease-in-out). Trả về false nếu người dùng chen vào giữa chừng.
+/// Smooth move (ease-in-out). Returns false if the user takes over midway.
 func smoothMove(from a: CGPoint, to b: CGPoint) -> Bool {
     let duration = Double.random(in: 0.2...0.6)
     let steps = max(15, Int(duration * 60))
@@ -98,9 +98,9 @@ func randomTarget(from p: CGPoint) -> CGPoint {
                    y: min(max(p.y + sin(angle) * dist, r.minY), r.maxY))
 }
 
-/// Cuộn xuống một số dòng ngẫu nhiên rồi cuộn lên lại đúng chừng đó để nội dung không bị lệch.
-/// Mỗi nấc cuộn cũng có số dòng ngẫu nhiên, chiều xuống và chiều lên random độc lập.
-/// Dừng lại nếu người dùng di chuột giữa chừng (vẫn cuộn trả lại phần đã cuộn).
+/// Scrolls down a random number of lines, then back up by the same amount so the content doesn't shift.
+/// Each tick also scrolls a random number of lines, down and up chosen independently.
+/// Stops if the user moves the mouse midway (still scrolls back what was scrolled).
 func smoothScroll() {
     let total = Int.random(in: minScrollLines...maxScrollLines)
     let start = currentPosition()
@@ -128,14 +128,14 @@ func distance(_ a: CGPoint, _ b: CGPoint) -> Double {
     hypot(a.x - b.x, a.y - b.y)
 }
 
-// MARK: - Phát hiện người dùng đang dùng máy
+// MARK: - Detecting that the user is active
 
-/// Thời điểm chương trình tự cuộn lần cuối.
+/// When the program last scrolled by itself.
 var lastOwnScroll = Date.distantPast
 
-/// Số giây kể từ lần cuối người dùng gõ phím / click / cuộn.
-/// Cuộn do chương trình tự gửi có thể bị tính vào scrollWheel, nên chỉ coi là
-/// người dùng cuộn khi lần cuộn gần nhất mới hơn lần tự cuộn của chương trình.
+/// Seconds since the user last typed / clicked / scrolled.
+/// The program's own scrolls may count as scrollWheel events, so a scroll counts
+/// as the user's only when it is newer than the program's last scroll.
 func secondsSinceUserInput() -> Double {
     let types: [CGEventType] = [.keyDown, .flagsChanged, .leftMouseDown, .rightMouseDown,
                                 .otherMouseDown, .leftMouseDragged]
@@ -145,7 +145,7 @@ func secondsSinceUserInput() -> Double {
     return result
 }
 
-// MARK: - Vòng lặp chính
+// MARK: - Main loop
 
 DispatchQueue.global().async {
     var lastPosition = currentPosition()
