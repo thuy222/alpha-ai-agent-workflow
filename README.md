@@ -22,7 +22,7 @@ reads the project's profile and works in the right repo under `../projects/`.
 | `/review` | Read-only review by the `alpha-code-reviewer` agent (plus a design diff by `alpha-lovable-reader` for FE) |
 | `/how-to-verify` | Writes a manual verification guide `docs/plans/<module>.verify.md` |
 | `/automation-test` | Runs the verify guide's scenarios in Chrome, **local/dev only**, and writes a report |
-| `/generate-daily-report` | Planned day-by-day report for a module (FE/BE/API integration) from the plans and BA doc, copied to the clipboard for Slack |
+| `/generate-daily-report` | Planned day-by-day report for a module, story by story (each story's BE, FE and API integration done before the next), from the plans and BA doc, copied to the clipboard for Slack |
 
 Agents: `alpha-code-reviewer`, `alpha-db-design-reviewer`,
 `alpha-lovable-reader`. They carry a prefix because a project repo may have an
