@@ -11,3 +11,7 @@ credentials/
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Swift build output (swift run)
+.build/
+.swiftpm/
